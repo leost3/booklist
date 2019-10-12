@@ -22,11 +22,26 @@ namespace BookList.Controllers
             return View(_db.Books.ToList()  );
         }
 
-        //GET bbok/create
+        //GET book/create
 
         public IActionResult Create()
         {
             return View();
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Create(Book book)
+        {
+            if(ModelState.IsValid)
+            {
+                _db.Add(book);
+                await _db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }else
+            {
+                return View(book);
+            }
         }
 
     }

@@ -16,7 +16,8 @@ namespace BookList.Models
         public String Name{ get; set; }
 
         public String Author { get; set; }
-
-        public String Price { get; set; }
+        [DataType(DataType.Currency)]
+        [Range(0.01,100.00, ErrorMessage ="Price must be between $0.01 and $100")]
+        public double Price { get; set; }
     }
 }
