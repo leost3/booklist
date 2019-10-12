@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BookList.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookList.Controllers
 {
@@ -44,5 +45,54 @@ namespace BookList.Controllers
             }
         }
 
+        //GET EDIT BOOK
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if( id == null)
+            {
+                return NotFound();
+            }
+
+            var book = await _db.Books.SingleOrDefaultAsync(m => m.Id == id);
+
+            if (book == null) return NotFound();
+
+            return View(book);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Book book)
+        {
+            if(ModelState.IsValid)
+            {
+                //_db.Update(book);
+                var BookFromDb = await _db.Books.FirstOrDefaultAsync(b => b.Id == book.Id);
+                BookFromDb.Name = book.Name;
+                BookFromDb.Author = book.Author;
+                BookFromDb.Price = book.Price;
+
+
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+
+            }
+            return View(book);
+        }
+
+        [HttpDelete]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete (Book book)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Remove(book);
+                await _db.SaveChangesAsync();
+                return Redirect(nameof(Index));
+            }
+
+            return View(book);
+
+        }
     }
 }
