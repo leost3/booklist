@@ -20,7 +20,7 @@ namespace BookList.Controllers
 
         public IActionResult Index()
         {
-            return View(_db.Books.ToList()  );
+            return View(_db.Books.ToList());
         }
 
         //GET book/create
@@ -34,12 +34,13 @@ namespace BookList.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Create(Book book)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _db.Add(book);
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Index");
-            }else
+            }
+            else
             {
                 return View(book);
             }
@@ -48,7 +49,7 @@ namespace BookList.Controllers
         //GET EDIT BOOK
         public async Task<IActionResult> Edit(int? id)
         {
-            if( id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -60,11 +61,12 @@ namespace BookList.Controllers
             return View(book);
         }
 
+        //EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Book book)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 //_db.Update(book);
                 var BookFromDb = await _db.Books.FirstOrDefaultAsync(b => b.Id == book.Id);
@@ -79,20 +81,46 @@ namespace BookList.Controllers
             }
             return View(book);
         }
-
-        [HttpDelete]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete (Book book)
+        //GET Delete BOOK
+        public async Task<IActionResult> Delete(int? id)
         {
-            if (ModelState.IsValid)
+            if (id == null)
             {
-                _db.Remove(book);
-                await _db.SaveChangesAsync();
-                return Redirect(nameof(Index));
+                return NotFound();
             }
 
-            return View(book);
+            var book = await _db.Books.SingleOrDefaultAsync(m => m.Id == id);
 
+            if (book == null) return NotFound();
+
+            return View(book);
         }
+
+        //Delete POST
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveBook(int? id)
+        {
+
+            var book = await _db.Books.SingleOrDefaultAsync(m => m.Id == id);
+            _db.Books.Remove(book);
+
+
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var book = await _db.Books.SingleOrDefaultAsync(m => m.Id == id);
+
+            if (book == null) return NotFound();
+
+            return View(book);
+        }
+
+
     }
 }
