@@ -21,5 +21,13 @@ namespace BookList.Controllers
         {
             return View(_db.Books.ToList()  );
         }
+
+        //GET bbok/create
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
     }
 }
